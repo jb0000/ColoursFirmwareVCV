@@ -85,7 +85,7 @@ struct Plaits : Module {
 	}
 
 	void onRandomize() override {
-		patch.engine = random::u32() % 16;
+		patch.engine = (random::u32() % 2) + 16;
 	}
 
 	json_t* dataToJson() override {
@@ -129,7 +129,7 @@ struct Plaits : Module {
 					patch.engine += 16;
 				}
 				else {
-					patch.engine = (patch.engine + 1) % 8 + 16;
+					patch.engine = (patch.engine + 1) % 2 + 16;
 				}
 			}
 
@@ -239,23 +239,9 @@ struct Plaits : Module {
 };
 
 
-static const std::string modelLabels[16] = {
-	"Pair of classic waveforms",
-	"Waveshaping oscillator",
-	"Two operator FM",
-	"Granular formant oscillator",
-	"Harmonic oscillator",
-	"Wavetable oscillator",
-	"Chords",
-	"Vowel and speech synthesis",
-	"Granular cloud",
-	"Filtered noise",
-	"Particle noise",
-	"Inharmonic string modeling",
-	"Modal resonator",
-	"Analog bass drum",
-	"Analog snare drum",
-	"Analog hi-hat",
+static const std::string modelLabels[2] = {
+	"Super Oscillator",
+	"Va Variant",
 };
 
 
@@ -345,10 +331,10 @@ struct PlaitsWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 		menu->addChild(createMenuLabel("Models"));
-		for (int i = 0; i < 16; i++) {
-			PlaitsModelItem* modelItem = createMenuItem<PlaitsModelItem>(modelLabels[i], CHECKMARK(module->patch.engine == i));
+		for (int i = 0; i < 2; i++) {
+			PlaitsModelItem* modelItem = createMenuItem<PlaitsModelItem>(modelLabels[i], CHECKMARK(module->patch.engine == i + 16));
 			modelItem->module = module;
-			modelItem->model = i;
+			modelItem->model = i + 16;
 			menu->addChild(modelItem);
 		}
 	}
