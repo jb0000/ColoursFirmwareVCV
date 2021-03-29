@@ -79,7 +79,7 @@ struct Plaits : Module {
 	}
 
 	void onReset() override {
-		patch.engine = 0;
+		patch.engine = 16;
 		patch.lpg_colour = 0.5f;
 		patch.decay = 0.5f;
 	}
@@ -124,20 +124,12 @@ struct Plaits : Module {
 			const int blockSize = 12;
 
 			// Model buttons
-			if (model1Trigger.process(params[MODEL1_PARAM].getValue())) {
-				if (patch.engine >= 8) {
-					patch.engine -= 8;
+			if (model1Trigger.process(params[MODEL1_PARAM].getValue()) || model2Trigger.process(params[MODEL2_PARAM].getValue())) {
+				if (patch.engine < 16) {
+					patch.engine += 16;
 				}
 				else {
-					patch.engine = (patch.engine + 1) % 8;
-				}
-			}
-			if (model2Trigger.process(params[MODEL2_PARAM].getValue())) {
-				if (patch.engine < 8) {
-					patch.engine += 8;
-				}
-				else {
-					patch.engine = (patch.engine + 1) % 8 + 8;
+					patch.engine = (patch.engine + 1) % 8 + 16;
 				}
 			}
 
@@ -149,7 +141,7 @@ struct Plaits : Module {
 			float tri = (triPhase < 0.5f) ? triPhase * 2.f : (1.f - triPhase) * 2.f;
 
 			// Get active engines of all voice channels
-			bool activeEngines[16] = {};
+			bool activeEngines[24] = {};
 			bool pulse = false;
 			for (int c = 0; c < channels; c++) {
 				int activeEngine = voice[c].active_engine();
@@ -160,9 +152,9 @@ struct Plaits : Module {
 			}
 
 			// Set model lights
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < 24; i++) {
 				// Transpose the [light][color] table
-				int lightId = (i % 8) * 2 + (i / 8);
+				int lightId = (i % 8) * 2;
 				float brightness = activeEngines[i];
 				if (patch.engine == i && pulse)
 					brightness = tri;
